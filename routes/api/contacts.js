@@ -6,9 +6,13 @@ const {
   addContactController,
   deleteContactByIdController,
   changeContactByIdController,
+  updateStatusController,
 } = require("../../controllers/contactsController");
 const { catchErrors } = require("../../middlewares/catch-errors");
-const { addContactValidation, putContactValidation } = require("./validation");
+const {
+  addContactValidation,
+  putContactValidation,
+} = require("../../middlewares/validation");
 
 const router = express.Router();
 
@@ -21,5 +25,6 @@ router.put(
   putContactValidation,
   catchErrors(changeContactByIdController)
 );
+router.patch("/:contactId/favorite", catchErrors(updateStatusController));
 
 module.exports = router;
