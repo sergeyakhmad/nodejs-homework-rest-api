@@ -8,6 +8,7 @@ const {
   changeContactByIdController,
   updateStatusController,
 } = require("../../controllers/contactsController");
+const { authMiddleware } = require("../../middlewares/authMiddleware");
 const { catchErrors } = require("../../middlewares/catch-errors");
 const {
   addContactValidation,
@@ -15,6 +16,8 @@ const {
 } = require("../../middlewares/validation");
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 router.get("/", catchErrors(getContactsController));
 router.get("/:contactId", catchErrors(getContactByIdController));
