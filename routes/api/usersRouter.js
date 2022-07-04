@@ -6,10 +6,12 @@ const {
   logoutController,
   currentUserController,
   updateSubscriptionUserController,
+  updateAvatarUserController,
 } = require("../../controllers/usersController");
 const { authMiddleware } = require("../../middlewares/authMiddleware");
 const { catchErrors } = require("../../middlewares/catch-errors");
 const { userValidation } = require("../../middlewares/validation");
+const { uploadMiddleware } = require("../../middlewares/uploadMiddleware");
 
 const router = express.Router();
 
@@ -21,6 +23,12 @@ router.patch(
   "/",
   authMiddleware,
   catchErrors(updateSubscriptionUserController)
+);
+router.patch(
+  "/avatars",
+  authMiddleware,
+  uploadMiddleware.single("avatar"),
+  catchErrors(updateAvatarUserController)
 );
 
 module.exports = router;

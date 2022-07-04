@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { User } = require("../models/userModel");
 const { Conflict, Unauthorized } = require("http-errors");
+const gravatar = require("gravatar");
 
 const registration = async (email, password) => {
   const user = await User.findOne({ email });
@@ -9,7 +10,8 @@ const registration = async (email, password) => {
     throw new Conflict("Email in use");
   }
 
-  const newUser = new User({ email, password });
+  const avatarURL = gravatar.url(email, { s: "200", r: "pg", d: "404" });
+  const newUser = new User({ email, password, avatarURL });
   await newUser.save();
 
   return newUser;
@@ -62,10 +64,16 @@ const updateSubscription = async (id, subscription) => {
   return await User.findByIdAndUpdate(id, { subscription }, { new: true });
 };
 
+const updateAvatar = async (id, avatarURL) => {
+  const user = await User.findByIdAndUpdate(id, { avatarURL }, { new: true });
+  return user;
+};
+
 module.exports = {
   registration,
   login,
   logout,
   currentUser,
   updateSubscription,
+  updateAvatar,
 };
