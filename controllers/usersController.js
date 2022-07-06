@@ -1,9 +1,16 @@
+const fs = require("fs").promises;
+const path = require("path");
+const getResizeAvatar = require("../middlewares/resizeAvatar");
+
 const {
   registration,
   login,
   logout,
   updateSubscription,
+  updateAvatar,
 } = require("../services/usersService");
+
+const FILE_DIR = path.resolve("./public/avatars");
 
 const registrationController = async (req, res, next) => {
   const { email, password } = req.body;
@@ -45,10 +52,31 @@ const updateSubscriptionUserController = async (req, res) => {
   res.status(200).json(user);
 };
 
+const updateAvatarUserController = async (req, res, next) => {
+  const { _id } = req.user;
+  const { path: temporaryName, originalname } = req.file;
+  await getResizeAvatar(temporaryName);
+  const [, extension] = originalname.split(".");
+  const fileName = `${_id}_avatar.${extension}`;
+  try {
+    const resultUpload = path.join(FILE_DIR, fileName);
+    await fs.rename(temporaryName, resultUpload);
+    const avatarURL = path.join("avatars", fileName);
+    const user = await updateAvatar(_id, avatarURL);
+    res.status(200).json({ avatarURL: user.avatarURL });
+  } catch (error) {
+    await fs.unlink(temporaryName);
+    return next(error);
+  }
+
+  res.status(200);
+};
+
 module.exports = {
   registrationController,
   loginController,
   logoutController,
   currentUserController,
   updateSubscriptionUserController,
+  updateAvatarUserController,
 };
