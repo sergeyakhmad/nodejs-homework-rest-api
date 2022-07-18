@@ -8,6 +8,8 @@ const {
   logout,
   updateSubscription,
   updateAvatar,
+  verification,
+  verify,
 } = require("../services/usersService");
 
 const FILE_DIR = path.resolve("./public/avatars");
@@ -19,6 +21,23 @@ const registrationController = async (req, res, next) => {
   res
     .status(201)
     .json({ user: { email: user.email, subscription: user.subscription } });
+};
+
+const verificationController = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  await verification(verificationToken);
+  res.status(200).json({ message: "Verification successful" });
+};
+
+const verifyController = async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({ message: "missing required field email" });
+  }
+
+  await verify(email);
+  res.status(200).json({ message: "Verification email sent" });
 };
 
 const loginController = async (req, res) => {
@@ -79,4 +98,6 @@ module.exports = {
   currentUserController,
   updateSubscriptionUserController,
   updateAvatarUserController,
+  verificationController,
+  verifyController,
 };
